@@ -76,7 +76,7 @@ def ingreso_de_productos():
                 "fecha": fecha_venta,
                 "items": items  # Aquí pasamos la lista de productos
             }         
-            directorio_facturas = "C:/Users/yidua/Documents/GitHub/Hocicones/Facturas"
+            directorio_facturas = "Facturas/"
             os.makedirs(directorio_facturas, exist_ok=True)  # Crea la carpeta si no existe
             archivos_existentes = os.listdir(directorio_facturas)
             numeros_facturas = [int(f.split("_")[1].split(".")[0]) for f in archivos_existentes if f.startswith("factura_") and f.endswith(".pdf")]
