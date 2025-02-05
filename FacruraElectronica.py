@@ -6,7 +6,6 @@ from email.mime.text import MIMEText
 from email.utils import formataddr
 
 def generar_factura(nombre_archivo, datos_factura):
-    os.makedirs(os.path.dirname(nombre_archivo), exist_ok=True)  # Crea la carpeta si no existe
     from reportlab.lib.pagesizes import letter
     from reportlab.pdfgen import canvas
 
