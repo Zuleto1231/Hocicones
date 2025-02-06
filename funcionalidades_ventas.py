@@ -98,6 +98,7 @@ def ingreso_de_productos():
 
         elif venta[0] == 'borrar':
             borrar_producto(df)
+            indice -= 1
             continue
 
         elif venta[0] == 'borrar' and indice == 1:
