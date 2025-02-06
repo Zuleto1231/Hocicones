@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import datetime
-from FacruraElectronica import *
+from FacturaElectronica import *
 
 def ingreso_de_productos():
     print(" ,--,    ,----..                                     ,----..            ,--.                       ")
