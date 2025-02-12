@@ -92,27 +92,93 @@ def ingreso_de_productos():
     else:
         print("No se realizaron ventas.")
 
-
+    
+    # Guardar cambios en el inventario
+#    df_inventario.to_excel("BD.xlsx", index=False)
+#   print("Inventario actualizado y guardado.")
 
     while True:
         respuesta = input("¿Desea devolver algún producto? (sí/no): ").strip().lower()
-        
+
         if respuesta == 'sí':
-#########            #df_ventas, df_inventario = devolver_producto(df_ventas, df_inventario)
-#####           #total_venta = mostrar_resumen_venta(df_ventas)
-####        #elif respuesta == 'no':
+            # Mostrar productos para devolución
+            print("Productos comprados:")
+            print(df_ventas[['Producto', 'Cantidad', 'Precio']])
+
+            # Solicitar al usuario qué producto desea devolver
+            producto_devolver_id = input("Ingrese el nombre del producto a devolver: ").strip()
+
+            # Verificar si el producto está en la lista de ventas
+            producto_devolver = df_ventas[df_ventas['Producto'] == producto_devolver_id]
+
+            if producto_devolver.empty:
+                print("El producto no se encuentra en la lista de compras.")
+                continue
+
+            # Solicitar la cantidad a devolver
+            cantidad_devolver = int(input(f"¿Cuántas unidades desea devolver de {producto_devolver_id}? "))
+
+            # Verificar que la cantidad no sea mayor a la vendida
+            cantidad_vendida = producto_devolver['Cantidad'].iloc[0]
+            if cantidad_devolver > cantidad_vendida:
+                print(f"No puedes devolver más de {cantidad_vendida} unidades.")
+                continue
+
+            # Actualizar el DataFrame de ventas y el inventario
+            df_ventas.loc[df_ventas['Producto'] == producto_devolver_id, 'Cantidad'] -= cantidad_devolver
+            df_inventario.loc[df_inventario['Producto'] == producto_devolver_id, 'Stock'] += cantidad_devolver
+
+            # Recalcular los costos
+            precio = producto_devolver['Precio'].iloc[0]
+            costo_total = cantidad_devolver * precio
+            IVA = costo_total * 0.19
+            total = costo_total + IVA
+
+            # Actualizar la venta con el nuevo precio y cantidad
+            df_ventas.loc[df_ventas['Producto'] == producto_devolver_id, 'Costo Total'] -= (costo_total + IVA)
+
+            print(f"Producto {producto_devolver_id} devuelto correctamente. Venta actualizada.")
+
+        elif respuesta == 'no':
             print("Compra confirmada.")
             break
         else:
             print("Respuesta no válida. Por favor ingrese 'sí' o 'no'.")
 
+    # Mostrar resumen actualizado después de la devolución
+    print("\nResumen final de la compra:")
+    print(df_ventas.to_string(index=False))  # Imprime todos los productos después de la devolución
+
     # Generar factura
     print("Generando factura...")
     # Generar la factura aquí
-    #generar_factura(ruta_factura, datos_factura)
+    nombre_cliente = input("Nombre del cliente: ")
+    correo_cliente = input("Correo del cliente: ")
+    fecha_venta = datetime.now().strftime("%d/%m/%Y")  # Fecha actual
+
+    items = []
+    for idx, row in df_ventas.iterrows():
+        item = {
+            'descripcion': row['Producto'],
+            'Cantidad': row['Cantidad'],
+            'Precio': row['Precio'],
+            'Costo Total': row['Costo Total']
+        }
+        items.append(item)
+
+    # Datos de la factura
+    datos_factura = {
+        "cliente": nombre_cliente,
+        "correo": correo_cliente,
+        "fecha": fecha_venta,
+        "items": items  # Aquí pasamos la lista de productos
+    }
+
+    # Aquí va la parte de la generación de la factura
+    # Generar y enviar la factura
 
     # Guardar cambios en el inventario
-    df_inventario.to_excel("BD.xlsx", index=False)
+    df_inventario.to_excel(file_path, index=False)
     print("Inventario actualizado y guardado.")
 
     #GENERAR Y MANDAR LA FACTURA    
@@ -152,6 +218,7 @@ def ingreso_de_productos():
         enviar_factura(correo_cliente, nombre_cliente, ruta_factura)
         print(f"Factura generada y enviada a {correo_cliente}")
         break
+
 
 if __name__ == "__main__":
     ingreso_de_productos()
