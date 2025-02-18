@@ -49,7 +49,7 @@ class VentanaLogin(QWidget):
         contrasena = self.input_contrasena.text()
 
         # Aquí debes validar el usuario y la contraseña (puedes hacerlo contra una base de datos o archivo)
-        if usuario == "admin" and contrasena == "1234":  # Esto es solo un ejemplo simple
+        if usuario == "caja" and contrasena == "1234":  # Esto es solo un ejemplo simple
             self.accept_login()
         else:
             self.mostrar_error()
