@@ -5,6 +5,7 @@ from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
 from email.utils import formataddr
 
+
 def generar_factura(nombre_archivo, datos_factura):
     from reportlab.lib.pagesizes import letter
     from reportlab.pdfgen import canvas
