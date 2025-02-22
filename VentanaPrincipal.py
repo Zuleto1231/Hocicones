@@ -1,20 +1,32 @@
 import sys
 import os
 import pandas as pd
+import random
+import openpyxl
 from datetime import datetime
-from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QPushButton,
-                             QLabel, QLineEdit, QTableWidget, QTableWidgetItem,
-                             QMessageBox, QInputDialog, QFileDialog, QHBoxLayout, QListWidget)
+
+# PyQt6 Imports
+from PyQt6.QtWidgets import (
+    QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit, 
+    QTableWidget, QTableWidgetItem, QMessageBox, QListWidget, QDialog,QFormLayout,QCheckBox
+
+)
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QFont
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QFont, QPixmap
+
+# Módulos personalizados
 from FacturaElectronica import generar_factura, enviar_factura
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit, QTableWidget, QTableWidgetItem, QMessageBox, QListWidget
-from PyQt6.QtGui import QFont
-from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLineEdit, QLabel, QPushButton
 from Login import *
 from GuardarVentas import *
+def aplicar_estilos(app):
+    try:
+        with open("estilos.qss", "r") as file:
+            styles = file.read()
+            app.setStyleSheet(styles)
+            print("✅ Estilos aplicados correctamente")
+    except Exception as e:
+        print(f"⚠️ Error al aplicar estilos: {e}")
+
 
 
 class VentanaPrincipal(QWidget):
@@ -198,7 +210,6 @@ class VentanaPrincipal(QWidget):
             }])
             nueva_fila = nueva_fila.dropna(axis=1, how='all')
             self.df_ventas = pd.concat([self.df_ventas, nueva_fila], ignore_index=True)
-
             self.actualizar_tabla()
             self.actualizar_total()  # Llamamos a esta función para actualizar el total a pagar
 
@@ -214,6 +225,7 @@ class VentanaPrincipal(QWidget):
             self.tabla.setItem(i, 1, QTableWidgetItem(str(row['Cantidad'])))
             self.tabla.setItem(i, 2, QTableWidgetItem(f"${row['Precio']:.0f}"))
             self.tabla.setItem(i, 3, QTableWidgetItem(f"${row['Costo Total']:.0f}"))
+            self.tabla.viewport().update()
     
     def realizar_compra(self):
         if self.df_ventas.empty:
@@ -224,9 +236,9 @@ class VentanaPrincipal(QWidget):
         resumen = ""
         total_compra = 0
         for _, row in self.df_ventas.iterrows():
-            resumen += f"Producto: {row['Producto']}\nCantidad: {row['Cantidad']}\nPrecio: ${row['Precio']:.2f}\n\n"
+            resumen += f"Producto: {row['Producto']}\nCantidad: {row['Cantidad']}\nPrecio: ${row['Precio']:.0f}\n\n"
             total_compra += row['Costo Total']    
-        resumen += f"\nTotal a pagar: ${total_compra:.2f}"
+        resumen += f"\nTotal a pagar: ${total_compra:.0f}"
         QMessageBox.information(self, "Resumen de Compra", resumen)
         self.generar_factura()
     
@@ -244,7 +256,6 @@ class VentanaPrincipal(QWidget):
             costo_total = row['Costo Total']
             total += costo_total  # Sumar el total
 
-        # Crear el diccionario del producto con las claves correctas
             productos_venta.append({
                 "Producto": producto,
                 "Cantidad": cantidad,
@@ -252,31 +263,55 @@ class VentanaPrincipal(QWidget):
                 "Costo Total": costo_total
             })
 
-    # Mostrar los datos antes de guardarlos para asegurarse que todo está bien
         print(f"Venta Creada: {venta_id} {productos_venta} {total}")
-        return [venta_id, nombre_cliente, productos_venta, total]  # Devolvemos el ID, el nombre del cliente, productos y total
+        return [venta_id, nombre_cliente, productos_venta, total] 
     
     def guardar_venta_en_excel(self, venta_data):
         try:
-            workbook = openpyxl.load_workbook("BD.xlsx")
-            if "Ventas" not in workbook.sheetnames:
-                sheet = workbook.create_sheet("Ventas")
+            file_path = "BD.xlsx"
+
+        # Cargar todas las hojas existentes
+            try:
+                existing_sheets = pd.read_excel(file_path, sheet_name=None)
+            except FileNotFoundError:
+                existing_sheets = {}
+
+        # Cargar la hoja de ventas si existe, sino crear un DataFrame vacío
+            if "Ventas" in existing_sheets:
+                df_ventas = existing_sheets["Ventas"]
             else:
-                sheet = workbook["Ventas"]
-        except FileNotFoundError:
-            workbook = openpyxl.Workbook()
-            sheet = workbook.active
-            sheet.title = "Ventas"
-        # Escribimos los encabezados si el archivo está vacío
-            sheet.append(["ID", "Cliente", "Producto", "Cantidad", "Precio", "Costo Total", "Total Venta"])
+                df_ventas = pd.DataFrame(columns=["ID", "Cliente", "Producto", "Cantidad", "Precio", "Costo Total", "Total Venta"])
 
-    # Guardar la venta con todos los productos, incluido el nombre del cliente
-        for producto in venta_data[2]:  # venta_data[2] es la lista de productos
-            sheet.append([venta_data[0], venta_data[1], producto["Producto"], producto["Cantidad"], producto["Precio"], producto["Costo Total"], venta_data[3]])
+        # Crear un DataFrame con los nuevos datos
+            nuevos_datos = []
+            for producto in venta_data[2]:  # venta_data[2] es la lista de productos
+                nuevos_datos.append([
+                    venta_data[0],  # ID de la venta
+                    venta_data[1],  # Nombre del Cliente
+                    producto["Producto"],  # Producto
+                    producto["Cantidad"],  # Cantidad
+                    producto["Precio"],  # Precio unitario
+                    producto["Costo Total"],  # Costo total
+                    venta_data[3]  # Total de la venta
+                ])
 
-    # Guardar el archivo
-        workbook.save("BD.xlsx")
-        print(f"Venta Guardada: {venta_data}")  # Asegúrate de que los datos se guardan correctamente
+            df_nuevas_ventas = pd.DataFrame(nuevos_datos, columns=["ID", "Cliente", "Producto", "Cantidad", "Precio", "Costo Total", "Total Venta"])
+
+        # Concatenar el DataFrame existente con los nuevos datos
+            df_ventas = pd.concat([df_ventas, df_nuevas_ventas], ignore_index=True)
+
+        # Actualizar solo la hoja de ventas sin tocar las demás
+            existing_sheets["Ventas"] = df_ventas
+
+            with pd.ExcelWriter(file_path, engine="openpyxl", mode="w") as writer:
+                for sheet_name, df in existing_sheets.items():
+                    df.to_excel(writer, sheet_name=sheet_name, index=False)
+
+            print(f"Venta Guardada: {venta_data}")  # Debugging
+
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"No se pudo guardar la venta en la base de datos.\n{str(e)}")
+
 
 ##############################################################################################################
     def generar_factura(self):
@@ -300,6 +335,16 @@ class VentanaPrincipal(QWidget):
         self.correo_input = QLineEdit(dialog)
         layout.addWidget(self.correo_label)
         layout.addWidget(self.correo_input)
+
+        #medio de pago
+        self.checkbox_tarjeta = QCheckBox("Tarjeta", dialog)
+        self.checkbox_transferencia = QCheckBox("Transferencia", dialog)
+        self.checkbox_efectivo = QCheckBox("Efectivo", dialog)
+
+        # Agregar los checkboxes al layout
+        layout.addWidget(self.checkbox_tarjeta)
+        layout.addWidget(self.checkbox_transferencia)
+        layout.addWidget(self.checkbox_efectivo)
 
     # Botón para confirmar
         self.confirm_button = QPushButton("Confirmar", dialog)
@@ -344,15 +389,16 @@ class VentanaPrincipal(QWidget):
         if not items:
             QMessageBox.warning(self, "Error", "No se pudieron obtener los precios de los productos.")
             return
-
+        venta_data = self.crear_venta(nombre_cliente)  # Esta función devuelve el ID de la venta y otros datos
+        venta_id = venta_data[0]
     # Crear los datos para la factura
         datos_factura = {
             "cliente": nombre_cliente,
             "correo": correo_cliente,
             "fecha": fecha_venta,
-            "items": items
+            "items": items, 
+            "id_venta": venta_id
         }
-
     # Nombre de la factura (basado en la fecha)
         fecha_venta_segura = fecha_venta.replace('/', '-')
         nombre_factura = f"factura_{fecha_venta_segura}.pdf"
@@ -360,15 +406,15 @@ class VentanaPrincipal(QWidget):
 
     # Generar la factura y enviarla por correo
         generar_factura(ruta_factura, datos_factura)
-        enviar_factura(correo_cliente, nombre_cliente, ruta_factura)
+        enviar_factura(correo_cliente, nombre_cliente, ruta_factura,venta_id)
 
     # Mostrar el mensaje final
         QMessageBox.information(self, "Éxito", f"Factura generada y enviada a {correo_cliente}")
 
     # Guardar la venta en Excel después de generar la factura
-        venta_data = self.crear_venta(nombre_cliente)  # Crear la venta con el nombre del cliente
         self.guardar_venta_en_excel(venta_data)  # Guardar la venta en el archivo Excel
-        self.limpiar_campos
+
+        self.limpiar_campos()
 
 
     def limpiar_campos(self):
@@ -381,15 +427,3 @@ class VentanaPrincipal(QWidget):
         self.df_ventas = pd.DataFrame(columns=['Producto', 'Cantidad', 'Precio', 'Costo Total'])  # Limpiar ventas
         self.actualizar_tabla()
         self.total_label.setText("Total a Pagar: $0.00")  # Limpiar el total
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    login = VentanaLogin()
-    login.show()
-    sys.exit(app.exec())
-    app = QApplication(sys.argv)
-    ventana = VentanaPrincipal()
-    ventana.show()
-    # Mover este código dentro de la clase donde self está definido
-    print(ventana.df_inventario.columns)
-    sys.exit(app.exec())
