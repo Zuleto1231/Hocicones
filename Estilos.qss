@@ -1,0 +1,70 @@
+QWidget {
+    background-color: #1E1E2E;
+    color: #E0E0E0;
+    font-family: 'Arial';
+    font-size: 14px;
+}
+
+QLabel {
+    color: #F8F8F2;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+QLineEdit {
+    background-color: #2E2E3E;
+    border: 1px solid #61AFEF;
+    color: white;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+QPushButton {
+    background-color: #61AFEF;
+    color: black;
+    border-radius: 5px;
+    padding: 8px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    background-color: #56B6C2;
+}
+
+QPushButton:pressed {
+    background-color: #98C379;
+}
+
+QTableWidget {
+    background-color: #2E2E3E;
+    border-radius: 5px;
+    gridline-color: #3E3E4E;
+}
+
+QHeaderView::section {
+    background-color: #3E3E4E;
+    padding: 5px;
+    border: 1px solid #565666;
+    font-weight: bold;
+    color: white;
+}
+
+QComboBox {
+    background-color: #2E2E3E;
+    border: 1px solid #61AFEF;
+    color: white;
+    border-radius: 5px;
+    padding: 5px;
+}
+/* Resalta la fila seleccionada en la tabla */
+QTableWidget::item:selected {
+    background-color: #ffffff;  /* CYAN*/
+    color: rgb(0, 0, 0);  /* Texto en blanco para que sea legible */
+    border-radius: 5px;
+}
+
+QListWidget::item:selected {
+    background-color: #ffffff;  /* Color de fondo más visible para el item seleccionado */
+    color: rgb(0, 0, 0);  /* Texto en negro para contraste */
+    border-radius: 5px;
+}
