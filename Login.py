@@ -5,6 +5,7 @@ from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt, QTimer
 from VentanaPrincipal import VentanaPrincipal  # Asegúrate de que esté en el mismo directorio
 from VentanaAdmin import VentanaAdmin
+from PyQt6.QtGui import QIcon
 
 class VentanaLogin(QWidget):
     def __init__(self):
@@ -12,6 +13,8 @@ class VentanaLogin(QWidget):
         
         self.setWindowTitle("SVH - Gestor de Ventas de Hocicones")
         self.setGeometry(100, 100, 800, 600)  # Tamaño ajustado a 800x600
+        self.setWindowIcon(QIcon("icono.png"))
+
         
         layout = QVBoxLayout()
         
