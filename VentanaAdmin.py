@@ -20,7 +20,7 @@ class VentanaAdmin(QWidget):
         super().__init__()
         self.setWindowTitle("Administracion")
         self.setGeometry(100, 100, 1280, 720)  # Establecer el tamaño de la ventana a 1280x720
-        self.setWindowIcon(QIcon("icono.png"))
+        self.setWindowIcon(QIcon("HOCICONES.ico"))
 
         layout = QVBoxLayout()
 
