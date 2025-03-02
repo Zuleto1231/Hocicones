@@ -1,6 +1,7 @@
 import pandas as pd
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QInputDialog, QLabel, QTableWidget, QTableWidgetItem, QPushButton, QLineEdit, QFormLayout, QDateEdit, QMessageBox, QDialog, QHBoxLayout, QHeaderView
-from PyQt6.QtCore import Qt, QDate
+from PyQt6.QtCore import Qt, QDate 
+from PyQt6.QtGui import QIcon
 import sys
 from PyQt6.QtWidgets import QApplication
 import re
@@ -19,6 +20,7 @@ class VentanaAdmin(QWidget):
         super().__init__()
         self.setWindowTitle("Administracion")
         self.setGeometry(100, 100, 1280, 720)  # Establecer el tamaño de la ventana a 1280x720
+        self.setWindowIcon(QIcon("icono.png"))
 
         layout = QVBoxLayout()
 
@@ -58,18 +60,10 @@ class VentanaAdmin(QWidget):
         self.btn_editar_producto.clicked.connect(self.editar_producto)
         boton_layout.addWidget(self.btn_editar_producto)
 
-        self.btn_bajo_stock = QPushButton("Consultar Productos con Bajo Stock", self)
-        self.btn_bajo_stock.clicked.connect(self.consultar_bajo_stock)
-        boton_layout.addWidget(self.btn_bajo_stock)
 
         layout.addLayout(boton_layout)  # Agregar el layout de botones al layout principal
 
         # Crear un QLineEdit para el buscador
-        self.busqueda_input = QLineEdit(self)
-        self.busqueda_input.setPlaceholderText("Buscar producto por nombre...")
-        self.busqueda_input.textChanged.connect(self.filtrar_tabla)
-        layout.addWidget(self.busqueda_input)  # Agregar el campo de búsqueda
-
         # Establecemos el layout para la ventana
         self.setLayout(layout)
 
@@ -301,11 +295,9 @@ class VentanaAdmin(QWidget):
             self.tabla_productos.setItem(i, 3, QTableWidgetItem(str(row['P_Venta'])))
             self.tabla_productos.setItem(i, 4, QTableWidgetItem(str(row['Stock'])))
 
-
-
     def filtrar_tabla(self):
         """Filtra la tabla en tiempo real mientras se escribe en el buscador"""
-        filtro = self.busqueda_input.text().strip().lower()  # Limpiar el texto y convertir a minúsculas
+        filtro = self.busqueda_input.text().strip().lower() 
 
         if filtro:  # Si hay texto en el buscador
             # Filtrar productos que contienen la palabra exacta en la columna 'Producto'
@@ -316,14 +308,12 @@ class VentanaAdmin(QWidget):
 
         self.tabla_productos.setRowCount(len(productos_filtrados))  # Actualiza el número de filas
 
-        # Llenamos la tabla con los productos filtrados (o todos si no hay filtro)
         for i, row in productos_filtrados.iterrows():
             self.tabla_productos.setItem(i, 0, QTableWidgetItem(str(row['ID'])))
             self.tabla_productos.setItem(i, 1, QTableWidgetItem(str(row['Producto'])))
             self.tabla_productos.setItem(i, 2, QTableWidgetItem(str(row['P_Compra'])))
             self.tabla_productos.setItem(i, 3, QTableWidgetItem(str(row['P_Venta'])))
             self.tabla_productos.setItem(i, 4, QTableWidgetItem(str(row['Stock'])))
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)  # Crear QApplication primero
