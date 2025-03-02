@@ -13,7 +13,7 @@ class VentanaLogin(QWidget):
         
         self.setWindowTitle("SVH - Gestor de Ventas de Hocicones")
         self.setGeometry(100, 100, 800, 600)  # Tamaño ajustado a 800x600
-        self.setWindowIcon(QIcon("icono.png"))
+        self.setWindowIcon(QIcon("HOCICONES.ico"))
 
         
         layout = QVBoxLayout()
