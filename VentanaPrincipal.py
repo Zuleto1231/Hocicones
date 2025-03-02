@@ -13,6 +13,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QPixmap
+from PyQt6.QtGui import QIcon
 
 # Módulos personalizados
 from FacturaElectronica import generar_factura, enviar_factura
@@ -37,6 +38,7 @@ class VentanaPrincipal(QWidget):
         self.df_inventario.columns = self.df_inventario.columns.str.strip()  # Eliminar espacios innecesarios       
         self.df_inventario['ID'] = pd.to_numeric(self.df_inventario['ID'], errors='coerce').astype('Int64')  # Asegurar tipo correcto       
         self.df_ventas = pd.DataFrame(columns=['Producto', 'Cantidad', 'Precio', 'Costo Total'])
+        self.setWindowIcon(QIcon("icono.png"))
         
         # Inicializamos la interfaz de usuario
         self.initUI()
