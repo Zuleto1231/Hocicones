@@ -35,7 +35,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\manue\OneDrive\Desktop\proyecto\Hocicones\hocicones"
+VIRTUAL_ENV="C:\Users\manue\OneDrive\Desktop\Hocicones\Hocicones\nuevo_ambiente"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
@@ -52,9 +52,9 @@ fi
 
 if [ -z "${VIRTUAL_ENV_DISABLE_PROMPT:-}" ] ; then
     _OLD_VIRTUAL_PS1="${PS1:-}"
-    PS1="(hocicones) ${PS1:-}"
+    PS1="(nuevo_ambiente) ${PS1:-}"
     export PS1
-    VIRTUAL_ENV_PROMPT="(hocicones) "
+    VIRTUAL_ENV_PROMPT="(nuevo_ambiente) "
     export VIRTUAL_ENV_PROMPT
 fi
 
