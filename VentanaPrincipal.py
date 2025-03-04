@@ -213,10 +213,10 @@ class VentanaPrincipal(QWidget):
             nueva_fila = nueva_fila.dropna(axis=1, how='all')
             self.df_ventas = pd.concat([self.df_ventas, nueva_fila], ignore_index=True)
             self.actualizar_tabla()
-            self.actualizar_total()  # Llamamos a esta función para actualizar el total a pagar
+             # Llamamos a esta función para actualizar el total a pagar
 
         except ValueError:
-            QMessageBox.warning(self, "Error", "Formato incorrecto. Use solo números.")
+            QMessageBox.warning(self, "Datos incompletos", "Para continuar selecciona el producto y su cantidad.")
 
 
     def actualizar_tabla(self):
